@@ -4,8 +4,8 @@ mng = Mng()
 
 payload = {
     "order": {
-        "referenceId": "SIPARIS134567",
-        "barcode": "SIPARIS134567",
+        "referenceId": "SIPARIS22234567",
+        "barcode": "SIPARIS22234567",
         "billOfLandingId": "İrsaliye 1",
         "isCOD": 0,
         "codAmount": 0,
@@ -53,6 +53,14 @@ payload = {
         "mobilePhoneNumber": "",
     },
 }
-shipping = mng.create_order(payload)
+# shipping = mng.create_order(payload)
+# print(shipping)
 
-print(shipping)
+query = mng.get_order(reference_id="SIPARIS12234567")
+print(query)
+
+# query = mng.get_shipment(reference_id="SIPARIS12234567")
+# print(query)
+#
+# query = mng.get_shipment_status(reference_id="SIPARIS12234567")
+# print(query)

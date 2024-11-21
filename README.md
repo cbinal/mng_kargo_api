@@ -7,7 +7,7 @@ MNG_KEY = "xxxxxxxxxxxxxxxx"
 MNG_SECRET = "xxxxxxxxxxxxxxxx"
 MNG_USER = "xxxxxxxxxxxxxxxx"
 MNG_PASS = "xxxxxxxxxxxxxxxx"
-MNG_URL = "https://testapi.mngkargo.com.tr"
+MNG_URL = "https://testapi.mngkargo.com.tr/mngapi/api"
 ```
 
 ## createOrder Alanları ve Açıklamaları

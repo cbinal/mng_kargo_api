@@ -14,61 +14,64 @@ class Mng:
         self.password = defs.MNG_PASS
         self.key = defs.MNG_KEY
         self.secret = defs.MNG_SECRET
-
-    def get_token(self):
-        if self.token and self.token_expiry and datetime.now() < self.token_expiry:
-            print("token süresi devam ediyor.")
-            return self.token
-
-        url = f"{defs.MNG_URL}/mngapi/api/token"
-        payload = {
-            "customerNumber": self.username,
-            "password": self.password,
-            "identityType": 1,
-        }
-        headers = {
+        self.headers = {
             "X-IBM-Client-Id": self.key,
             "X-IBM-Client-Secret": self.secret,
             "content-type": "application/json",
             "accept": "application/json",
         }
-        response = requests.post(url, json=payload, headers=headers)
+
+    def decode_response(self, response):
+        response_json = json.loads(response.text)
+
+        if response.status_code == 200:
+            response_desc = response_json
+        else:
+            response_desc = (
+                response_json["error"] if response_json["error"] else response_json
+            )
+
+        return {"status": response.status_code, "result": response_desc}
+
+    def make_request(self, method, endpoint, payload=None):
+        self.get_token()
+
+        url = f"{defs.MNG_URL}/{endpoint}"
+        response = requests.request(method, url, json=payload, headers=self.headers)
+        return self.decode_response(response)
+
+    def get_token(self):
+        if self.token and self.token_expiry and datetime.now() < self.token_expiry:
+            print("token süresi devam ediyor.")
+            self.headers["Authorization"] = f"Bearer {self.token}"
+
+        url = f"{defs.MNG_URL}/token"
+        payload = {
+            "customerNumber": self.username,
+            "password": self.password,
+            "identityType": 1,
+        }
+        response = requests.post(url, json=payload, headers=self.headers)
         response_json = json.loads(response.text)
 
         if response.status_code == 200:
             self.token_expiry = datetime.strptime(
                 response_json["refreshTokenExpireDate"], "%d.%m.%Y %H:%M:%S"
             )
-            return response_json["jwt"]
+            self.headers["Authorization"] = f"Bearer {response_json["jwt"]}"
         else:
             return False
 
     def create_order(self, payload):
-        self.token = self.get_token()
+        return self.make_request("POST", "/standardcmdapi/createOrder", payload)
 
-        if self.token:
-            url = f"{defs.MNG_URL}/mngapi/api/standardcmdapi/createOrder"
+    def get_order(self, reference_id):
+        return self.make_request("GET", f"/standardqueryapi/getorder/{reference_id}")
 
-            headers = {
-                "X-IBM-Client-Id": self.key,
-                "X-IBM-Client-Secret": self.secret,
-                "Authorization": f"Bearer {self.token}",
-                "content-type": "application/json",
-                "accept": "application/json",
-            }
+    def get_shipment(self, reference_id):
+        return self.make_request("GET", f"/standardqueryapi/getshipment/{reference_id}")
 
-            response = requests.post(url, json=payload, headers=headers)
-            print(response.text)
-            if response.status_code == 200:
-                return {
-                    "status": response.status_code,
-                    "response": json.loads(response.text),
-                }
-            else:
-                print(response.text)
-                resp_json = json.loads(response.text)
-                return (
-                    resp_json["error"]["Description"]
-                    if "Description" in resp_json["error"]
-                    else resp_json["error"]["description"]
-                )
+    def get_shipment_status(self, reference_id):
+        return self.make_request(
+            "GET", f"/standardqueryapi/getshipmentstatus/{reference_id}"
+        )
