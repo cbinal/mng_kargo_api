@@ -68,6 +68,5 @@ Kargo alıcısının bilgileri
 ### createOrder Çıktısı
 
 ```python
-[{"orderInvoiceId":"1618262","orderInvoiceDetailId":"1618775","shipperBranchCode":"03401700","referenceId":"SIPARIS134567"}]
-{'status': 200, 'response': [{'orderInvoiceId': '1618262', 'orderInvoiceDetailId': '1618775', 'shipperBranchCode': '03401700', 'referenceId': 'SIPARIS134567'}]}
+{'status': 200, 'result': [{'orderInvoiceId': '1619005', 'orderInvoiceDetailId': '1619518', 'shipperBranchCode': '03401700', 'referenceId': 'SIPARIS22234567'}]}
 ```
