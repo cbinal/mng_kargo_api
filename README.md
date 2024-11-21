@@ -1,5 +1,10 @@
 # MNG Kargo API Kullanım Klavuzu
 
+## Yapılması gerekenler
+
+- https://sandbox.mngkargo.com.tr/ adresinden bir kullanıcı oluşturulmalı
+- Kullanıcı oluşturulduktan sonra panel üzerinden uygulama oluşturulmalı. (Daha sonra bu uygulamaya API ürünleri eklenecek)
+
 ## definations.py
 
 ```python
@@ -10,9 +15,80 @@ MNG_PASS = "xxxxxxxxxxxxxxxx"
 MNG_URL = "https://testapi.mngkargo.com.tr/mngapi/api"
 ```
 
-## createOrder Alanları ve Açıklamaları
+## Sınıfın oluşturulması
 
-### order (Object)
+```python
+from Mng import Mng
+mng = Mng()
+```
+
+## Standard Command API 1.0
+
+createOrder, cancelOrder gibi metodların kullanılabilmesi için "Standard Command API 1.0" ürününün uygulamasınıza eklenmesi gerekmektedir.
+
+### createOrder Alanları ve Açıklamaları
+
+Normal gönderi oluşturulan metoddur.
+
+Kullanımı :
+
+```python
+payload = {
+    "order": {
+        "referenceId": "SIPARIS22234567",
+        "barcode": "SIPARIS22234567",
+        "billOfLandingId": "İrsaliye 1",
+        "isCOD": 0,
+        "codAmount": 0,
+        "shipmentServiceType": 1,
+        "packagingType": 1,
+        "content": "İçerik 1",
+        "smsPreference1": 1,
+        "smsPreference2": 0,
+        "smsPreference3": 0,
+        "paymentType": 1,
+        "deliveryType": 1,
+        "description": "Açıklama 1",
+        "marketPlaceShortCode": "",
+        "marketPlaceSaleCode": "",
+        "pudoId": "",
+    },
+    "orderPieceList": [
+        {
+            "barcode": "SIPARIS34567_PARCA1",
+            "desi": 2,
+            "kg": 1,
+            "content": "Parça açıklama 1",
+        },
+        {
+            "barcode": "SIPARIS34567_PARCA2",
+            "desi": 2,
+            "kg": 3,
+            "content": "Parça açıklama 2",
+        },
+    ],
+    "recipient": {
+        "customerId": 58513278,
+        "refCustomerId": "",
+        "cityCode": 0,
+        "cityName": "",
+        "districtName": "",
+        "districtCode": 0,
+        "address": "",
+        "bussinessPhoneNumber": "",
+        "email": "",
+        "taxOffice": "",
+        "taxNumber": "",
+        "fullName": "",
+        "homePhoneNumber": "",
+        "mobilePhoneNumber": "",
+    },
+}
+
+shipping = mng.create_order(payload)
+```
+
+#### order (Object)
 
 Kargo genel bilgileri
 
@@ -35,7 +111,7 @@ Kargo genel bilgileri
 | marketPlaceShortCode |         | string    | Pazaryeri Kodu                                                                                       | TRND, N11, GG, VIVE                                      |
 | marketPlaceSaleCode  |         | string    | Pazaryeri Satış Kodu                                                                                 |                                                          |
 
-### orderPieceList (Array)
+#### orderPieceList (Array)
 
 Kargo parçaları listesi
 
@@ -46,7 +122,7 @@ Kargo parçaları listesi
 | kg       | X       | integer   | Parça Ağırlığı |
 | content  |         | string    | Paket içeriği  |
 
-### recipient (Object)
+#### recipient (Object)
 
 Kargo alıcısının bilgileri
 
@@ -65,8 +141,16 @@ Kargo alıcısının bilgileri
 | homePhoneNumber      | string    | Ev telefon numarası                                  |
 | mobilePhoneNumber    | string    | Cep telefon numarası                                 |
 
-### createOrder Çıktısı
+#### createOrder Çıktısı
 
 ```python
 {'status': 200, 'result': [{'orderInvoiceId': '1619005', 'orderInvoiceDetailId': '1619518', 'shipperBranchCode': '03401700', 'referenceId': 'SIPARIS22234567'}]}
 ```
+
+### cancelOrder
+
+createOrder ile oluşturulmuş gönderinin iptal edildiği metoddur.
+
+## Barcode Command API 1.0
+
+Oluşturulan kargo bu API ürünü ile faturalaştırılabilir. Kullanabilmek için ayrıca istekte bulunduğunuz IP nin MNG tarafında izne ihtiyacı vardır.

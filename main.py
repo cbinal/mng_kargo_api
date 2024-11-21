@@ -53,11 +53,46 @@ payload = {
         "mobilePhoneNumber": "",
     },
 }
+
+payload1 = {
+    "referenceId": "SIPARIS22234567",
+    "billOfLandingId": "İrsaliye 1",
+    "isCOD": 0,
+    "codAmount": 0,
+    "packagingType": 2,
+    "printReferenceBarcodeOnError": 0,
+    "message": "Mesaj 1",
+    "additionalContent1": "",
+    "additionalContent2": "",
+    "additionalContent3": "",
+    "additionalContent4": "",
+    "orderPieceList": [
+        {
+            "barcode": "SIPARIS34567_PARCA1",
+            "desi": 2,
+            "kg": 1,
+            "content": "Parça açıklama 1",
+        },
+        {
+            "barcode": "SIPARIS34567_PARCA2",
+            "desi": 2,
+            "kg": 3,
+            "content": "Parça açıklama 2",
+        },
+    ],
+}
+
 # shipping = mng.create_order(payload)
 # print(shipping)
 
-query = mng.get_order(reference_id="SIPARIS12234567")
-print(query)
+shipping = mng.cancel_order("SIPARIS1234567")
+print(shipping)
+
+# shipping = mng.create_barcode(payload1)
+# print(shipping)
+
+# query = mng.get_order(reference_id="SIPARIS12234567")
+# print(query)
 
 # query = mng.get_shipment(reference_id="SIPARIS12234567")
 # print(query)

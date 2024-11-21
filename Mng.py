@@ -22,7 +22,10 @@ class Mng:
         }
 
     def decode_response(self, response):
-        response_json = json.loads(response.text)
+        if response.text:
+            response_json = json.loads(response.text)
+        else:
+            response_json = {}
 
         if response.status_code == 200:
             response_desc = response_json
@@ -38,6 +41,7 @@ class Mng:
 
         url = f"{defs.MNG_URL}/{endpoint}"
         response = requests.request(method, url, json=payload, headers=self.headers)
+        # return response.text
         return self.decode_response(response)
 
     def get_token(self):
@@ -58,12 +62,18 @@ class Mng:
             self.token_expiry = datetime.strptime(
                 response_json["refreshTokenExpireDate"], "%d.%m.%Y %H:%M:%S"
             )
-            self.headers["Authorization"] = f"Bearer {response_json["jwt"]}"
+            self.headers["Authorization"] = f"Bearer {response_json['jwt']}"
         else:
             return False
 
     def create_order(self, payload):
         return self.make_request("POST", "/standardcmdapi/createOrder", payload)
+
+    def cancel_order(self, reference_id):
+        return self.make_request("PUT", f"/standardcmdapi/cancelorder/{reference_id}")
+
+    def create_barcode(self, payload):
+        return self.make_request("POST", "/barcodecmdapi/createbarcode", payload)
 
     def get_order(self, reference_id):
         return self.make_request("GET", f"/standardqueryapi/getorder/{reference_id}")
