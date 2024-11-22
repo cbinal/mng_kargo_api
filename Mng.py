@@ -45,30 +45,6 @@ class Mng:
         return response.text
         return self.decode_response(response)
 
-    # def get_token(self):
-    #     if self.token and self.token_expiry and datetime.now() < self.token_expiry:
-    #         print("token süresi devam ediyor.")
-    #         self.headers["Authorization"] = f"Bearer {self.token}"
-    #     else:
-    #         print(f'token süresi bitmiş.{self.token_expiry}')
-
-    #     url = f"{defs.MNG_URL}/token"
-    #     payload = {
-    #         "customerNumber": self.username,
-    #         "password": self.password,
-    #         "identityType": 1,
-    #     }
-    #     response = requests.post(url, json=payload, headers=self.headers)
-    #     response_json = json.loads(response.text)
-
-    #     if response.status_code == 200:
-    #         self.token_expiry = datetime.strptime(
-    #             response_json["refreshTokenExpireDate"], "%d.%m.%Y %H:%M:%S"
-    #         )
-    #         self.headers["Authorization"] = f"Bearer {response_json['jwt']}"
-    #     else:
-    #         return False
-
     def get_token(self):
         print('yeni token alınacak');
         url = f"{defs.MNG_URL}/token"
