@@ -1,4 +1,4 @@
-import definations as defs
+import definitions as defs
 
 from datetime import datetime
 import json
@@ -8,6 +8,7 @@ import requests
 class Mng:
 
     def __init__(self):
+        print('Mng ilklendi.')
         self.token = None
         self.token_expiry = None
         self.username = defs.MNG_USER
@@ -37,18 +38,39 @@ class Mng:
         return {"status": response.status_code, "result": response_desc}
 
     def make_request(self, method, endpoint, payload=None):
-        self.get_token()
+        self.ensure_token()
 
         url = f"{defs.MNG_URL}/{endpoint}"
         response = requests.request(method, url, json=payload, headers=self.headers)
-        # return response.text
+        return response.text
         return self.decode_response(response)
 
-    def get_token(self):
-        if self.token and self.token_expiry and datetime.now() < self.token_expiry:
-            print("token süresi devam ediyor.")
-            self.headers["Authorization"] = f"Bearer {self.token}"
+    # def get_token(self):
+    #     if self.token and self.token_expiry and datetime.now() < self.token_expiry:
+    #         print("token süresi devam ediyor.")
+    #         self.headers["Authorization"] = f"Bearer {self.token}"
+    #     else:
+    #         print(f'token süresi bitmiş.{self.token_expiry}')
 
+    #     url = f"{defs.MNG_URL}/token"
+    #     payload = {
+    #         "customerNumber": self.username,
+    #         "password": self.password,
+    #         "identityType": 1,
+    #     }
+    #     response = requests.post(url, json=payload, headers=self.headers)
+    #     response_json = json.loads(response.text)
+
+    #     if response.status_code == 200:
+    #         self.token_expiry = datetime.strptime(
+    #             response_json["refreshTokenExpireDate"], "%d.%m.%Y %H:%M:%S"
+    #         )
+    #         self.headers["Authorization"] = f"Bearer {response_json['jwt']}"
+    #     else:
+    #         return False
+
+    def get_token(self):
+        print('yeni token alınacak');
         url = f"{defs.MNG_URL}/token"
         payload = {
             "customerNumber": self.username,
@@ -56,15 +78,20 @@ class Mng:
             "identityType": 1,
         }
         response = requests.post(url, json=payload, headers=self.headers)
-        response_json = json.loads(response.text)
-
         if response.status_code == 200:
+            response_json = response.json()
             self.token_expiry = datetime.strptime(
                 response_json["refreshTokenExpireDate"], "%d.%m.%Y %H:%M:%S"
             )
-            self.headers["Authorization"] = f"Bearer {response_json['jwt']}"
+            return response_json["jwt"]
         else:
-            return False
+            raise Exception("Failed to retrieve token")
+        
+    def ensure_token(self):
+        if not self.token or not self.token_expiry or datetime.now() >= self.token_expiry:
+            self.token = self.get_token()
+        print('token süresi devam ediyor.')
+        self.headers["Authorization"] = f"Bearer {self.token}"
 
     def create_order(self, payload):
         return self.make_request("POST", "/standardcmdapi/createOrder", payload)
